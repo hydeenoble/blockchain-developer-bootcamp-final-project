@@ -19,7 +19,7 @@
  
   <style>
     .fs-small{
-      /* font-size: 0.65rem */
+      font-size: 0.65rem
     }
   </style>
   </head>
@@ -29,78 +29,76 @@
         <a class="navbar-brand" href="#">Robin</a>
 
         <div class="d-flex">
-          <span class="navbar-text">
-            0x3E031Aa3B215Fa5c65261A1050084BA941488Ee6
-          <span>
+          <span id="account" class="navbar-text"><span>
         </div>
       </div>
     </nav>
 
 
+  <div id="loader">
+    <p class="text-center">Loading...</p>
+  </div>
 
+  <div id="main-content">
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-4">
-          <div class="row row-cols-1">
-            <div class="col" >
-              <form>
-                <div class="input-group mb-3">
-                  <input type="text" class="form-control" placeholder="Address" aria-label="Recipient's username" aria-describedby="button-addon2">
-                  <button class="btn btn-outline-success" type="button" id="button-addon2">Grant Access</button>
-                </div>
-              </form>
-            </div>
-            <div class="col"  >
-              <!-- List of patients -->
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="row row-cols-1">
+              <div class="col" >
+                <form onSubmit="App.grantAccess(); return false;">
+                  <div class="input-group mb-3">
+                    <input id="doctors-address" type="text" class="form-control" placeholder="Doctor's Address" aria-label="Doctor's Address" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-success" type="submit" id="button-addon2">Grant Access</button>
+                  </div>
+                </form>
+              </div>
+              <div class="col"  >
+                <!-- List of patients -->
 
-              <!-- <ul class="list-group list-group-flush">
-                <li class="list-group-item">An item</li>
-                <li class="list-group-item">A second item</li>
-                <li class="list-group-item">A third item</li>
-                <li class="list-group-item">A fourth item</li>
-                <li class="list-group-item">And a fifth one</li>
-              </ul> -->
+                <!-- <ul class="list-group list-group-flush">
+                  <li class="list-group-item">An item</li>
+                  <li class="list-group-item">A second item</li>
+                  <li class="list-group-item">A third item</li>
+                  <li class="list-group-item">A fourth item</li>
+                  <li class="list-group-item">And a fifth one</li>
+                </ul> -->
 
 
-              <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center fs-small">
-                  0x6f6a3dbe4d9d31e722bb1e441d9dffe6aa0a92c5
-                  <i class="bi bi-trash-fill"></i>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center fs-small">
-                  0x6f6a3dbe4d9d31e722bb1e441d9dffe6aa0a92c5
-                  <i class="bi bi-trash-fill"></i>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center fs-small">
-                  0x6f6a3dbe4d9d31e722bb1e441d9dffe6aa0a92c5
-                  <i class="bi bi-trash-fill"></i>
-                </li>
-              </ul>
-              
+                <ul id="pd-ul" class="list-group">
+                  <li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-small">
+                    <!-- <i class="bi bi-trash-fill"></i> -->
+                  </li>
+                </ul>
+                
+              </div>
             </div>
           </div>
+
+          
+          <div class="col-sm col-md col-lg" style="border: 1px solid red">
+            Upload a new report
+            <form>
+              <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+              </div>
+              <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Submit</button>
+
+            </form>
+          </div>
+
         </div>
 
-        
-        <div class="col-sm col-md col-lg" style="border: 1px solid red">
-          Upload a new report
-          <form>
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
-            </div>
-            <div class="mb-3">
-              <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-
-          </form>
-        </div>
 
       </div>
-    </div>
+
+
+  </div>
 
 
 

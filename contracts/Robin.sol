@@ -4,10 +4,17 @@ pragma solidity >=0.4.22 <0.9.0;
 // robin = await Robin.deployed()
 
 contract Robin {
+    uint public permittedDoctorsCount = 0;
     address public owner = msg.sender;
 
     // mapping (address => bool) public permittedDoctors;
+    // mapping(address => mapping(address => bool)) public permittedDoctors;
+
+    // mapping(address => mapping(uint => mapping(address => bool))) public permittedDoctors;
+
+    mapping(address => mapping(uint => address)) public permittedDoctorsList;
     mapping(address => mapping(address => bool)) public permittedDoctors;
+
     mapping(address => Report) public reports;
 
     /*
@@ -54,12 +61,19 @@ contract Robin {
     constructor() public {}
 
     // a patient should not be able to grant his/her self permission
-    function grantAccess(address _address) public returns (bool) {
-        permittedDoctors[owner][_address] = true;
+    function grantAccess(address _patient, address _address) public returns (bool) {
+        permittedDoctorsCount ++;
+        
+        permittedDoctorsList[_patient][permittedDoctorsCount] = _address;
+        permittedDoctors[_patient][_patient] = true;
 
-        emit LogPermittedDoctors(owner, _address, true);
+        emit LogPermittedDoctors(_patient, _address, true);
 
-        return permittedDoctors[owner][_address];
+        return permittedDoctors[_patient][_patient];
+    }
+
+    function getListOfPermittedDoctors(address _patient) public {
+        
     }
 
     // patienrs should be able to revoke doctors permission as anytime
@@ -69,7 +83,7 @@ contract Robin {
     function createReport() public {}
 
     // only permitted doctors and owner should be able to list reports
-    function listReports() public {}
+    function getReports() public {}
 
     // report detials should be encrypted before adding them to the blockchain.
     function encryptReport() public {}
