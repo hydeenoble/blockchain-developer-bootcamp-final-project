@@ -1,5 +1,6 @@
 App = {
     loading: false,
+    zeroAddress: "0x0000000000000000000000000000000000000000",
     contracts: {},
 
     load: async() => {
@@ -73,14 +74,17 @@ App = {
 
         for (let i = 1; i <= pdCount; i++) {
             const pd = await App.robin.permittedDoctorsList(App.account, i)
-            console.log("doctor" + i, await App.robin.permittedDoctorsList(App.account, i))
 
-            const $newPdTemplate = $pdTemplate.clone();
-            $newPdTemplate.html(pd + '<i class="bi bi-trash-fill"></i>');
+            if (pd != App.zeroAddress) {
+                console.log("doctor" + i, pd)
 
-            $('#pd-ul').append($newPdTemplate)
+                const $newPdTemplate = $pdTemplate.clone();
+                $newPdTemplate.html(pd + '<i class="bi bi-trash-fill"></i>');
 
-            $newPdTemplate.show()
+                $('#pd-ul').append($newPdTemplate)
+
+                $newPdTemplate.show()
+            }
         }
     },
 
