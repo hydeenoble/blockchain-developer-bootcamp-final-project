@@ -62,27 +62,36 @@ App = {
     grantAccess: async() => {
         App.setLoading(true);
         const doctorsAddress = $('#doctors-address').val();
-        // console.log("doctorsAddress", doctorsAddress)
         await App.robin.grantAccess(App.account, doctorsAddress, { from: App.account })
+        window.location.reload()
+    },
+
+    revokeAccess: async(event) => {
+        console.log(event.data.pdId);
+
+        alert(`Are you sure you was to revoke access for ${event.data.pdAdrress}?`);
+
+        await App.robin.revokeAccess(App.account, event.data.pdAdrress, event.data.pdId, { from: App.account });
         window.location.reload()
     },
 
     getPermittedDoctors: async() => {
         const pdCount = await App.robin.permittedDoctorsCount();
 
-        const $pdTemplate = $('.pd-li')
+        const $pdTemplate = $('<li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-small"> </li>')
 
         for (let i = 1; i <= pdCount; i++) {
             const pd = await App.robin.permittedDoctorsList(App.account, i)
 
-            if (pd != App.zeroAddress) {
-                console.log("doctor" + i, pd)
+            console.log(i, pd)
 
+            if (pd != App.zeroAddress) {
                 const $newPdTemplate = $pdTemplate.clone();
-                $newPdTemplate.html(pd + '<i class="bi bi-trash-fill"></i>');
+                $newPdTemplate.html(
+                    `${pd} <i class = "bi bi-trash-fill" > </i>`
+                ).on('click', { pdId: i, pdAdrress: pd }, App.revokeAccess);
 
                 $('#pd-ul').append($newPdTemplate)
-
                 $newPdTemplate.show()
             }
         }

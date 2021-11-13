@@ -61,23 +61,29 @@ contract Robin {
     constructor() public {}
 
     // a patient should not be able to grant his/her self permission
-    function grantAccess(address _patient, address _address) public returns (bool) {
+    function grantAccess(address _patient, address _doctor) public returns (bool) {
         permittedDoctorsCount ++;
         
-        permittedDoctorsList[_patient][permittedDoctorsCount] = _address;
-        permittedDoctors[_patient][_patient] = true;
+        permittedDoctorsList[_patient][permittedDoctorsCount] = _doctor;
+        permittedDoctors[_patient][_doctor] = true;
 
-        emit LogPermittedDoctors(_patient, _address, true);
+        emit LogPermittedDoctors(_patient, _doctor, true);
 
-        return permittedDoctors[_patient][_patient];
+        return permittedDoctors[_patient][_doctor];
     }
 
-    function getListOfPermittedDoctors(address _patient) public {
+    // function getListOfPermittedDoctors(address _patient) public {
+    //     // check if this is the patient
         
-    }
+    //     // delete permittedDoctors[_patient][_doctor];
+
+    // }
 
     // patienrs should be able to revoke doctors permission as anytime
-    function revokeAccess() public {}
+    function revokeAccess(address _patient, address _doctor, uint _pdcount) public {
+        delete permittedDoctorsList[_patient][_pdcount];
+        delete permittedDoctors[_patient][_doctor];
+    }
 
     // only permitted doctors should be able to create a report
     function createReport() public {}
