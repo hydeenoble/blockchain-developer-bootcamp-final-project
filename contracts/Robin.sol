@@ -4,54 +4,73 @@ pragma solidity >=0.4.22 <0.9.0;
 // robin = await Robin.deployed()
 
 contract Robin {
+    address public owner = msg.sender;
 
-  address public owner = msg.sender;
-  
-  // mapping (address => bool) public permittedDoctors;
-  mapping (address => mapping (address => bool)) public permittedDoctors;
+    // mapping (address => bool) public permittedDoctors;
+    mapping(address => mapping(address => bool)) public permittedDoctors;
+    mapping(address => Report) public reports;
 
-  /* 
-   * struct
-   */
+    /*
+     * enum
+     */
 
-  struct Doctor {
-    address id;
-  }
+    // enum UserType { Doctor, Patient }
 
-  struct Patient {
-    address id;
-  }
+    /*
+     * struct
+     */
 
-  struct Report {
-    address patientId;
-    address doctorId;
-    string title;
-    string date;
-    string content;
-  }
-
-  /* 
-   * Events
-   */
-
-   event LogPermittedDoctors(address patient, address doctor, bool permitted)
-
-  constructor() public {
-  }
-
-  function grantAccess(address _address) public returns (bool){
-      permittedDoctors[owner][_address] = true;
-
-      emit LogPermittedDoctors(owner, _address, true);
-
-      return  permittedDoctors[owner][_address];
+    struct Doctor {
+        address id;
     }
-  
-  function revokeAccess() {}
 
-  function createReport() {}
+    struct Patient {
+        address id;
+    }
 
-  function listReport() {}
+    struct Report {
+        // address patientId;
+        address doctorId;
+        string title;
+        string date;
+        string content;
+    }
 
-  function encryptReport() {}
+    /*
+     * Events
+     */
+
+    event LogPermittedDoctors(address patient, address doctor, bool permitted);
+
+    /*
+     * Modifiers
+     */
+
+    //  modifier isNotPatient(uint _sku) {
+    //   require(msg.sender == items[_sku].seller);
+    //   _;
+    // }
+
+    constructor() public {}
+
+    // a patient should not be able to grant his/her self permission
+    function grantAccess(address _address) public returns (bool) {
+        permittedDoctors[owner][_address] = true;
+
+        emit LogPermittedDoctors(owner, _address, true);
+
+        return permittedDoctors[owner][_address];
+    }
+
+    // patienrs should be able to revoke doctors permission as anytime
+    function revokeAccess() public {}
+
+    // only permitted doctors should be able to create a report
+    function createReport() public {}
+
+    // only permitted doctors and owner should be able to list reports
+    function listReports() public {}
+
+    // report detials should be encrypted before adding them to the blockchain.
+    function encryptReport() public {}
 }
