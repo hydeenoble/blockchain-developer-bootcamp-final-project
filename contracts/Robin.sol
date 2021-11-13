@@ -8,7 +8,7 @@ contract Robin {
   address public owner = msg.sender;
   
   // mapping (address => bool) public permittedDoctors;
-  mapping (address => mapping (address => bool)) public ());
+  mapping (address => mapping (address => bool)) public permittedDoctors;
 
   /* 
    * struct
