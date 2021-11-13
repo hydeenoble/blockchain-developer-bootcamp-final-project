@@ -1,0 +1,34 @@
+{
+  "name": "@hydeenoble/blockchain-developer-bootcamp-final-project",
+  "version": "1.0.0",
+  "description": "\"Blockchain Todo List Powered By Ethereum\"",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && sexit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project.git"
+  },
+  "keywords": [
+    "ETH",
+    "ConsenSys"
+  ],
+  "author": "Idowu Emehinola <hydeenoble39@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project/issues"
+  },
+  "homepage": "https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project#readme",
+  "devDependencies": {
+    "bootstrap": "^5.1.3",
+    "lite-server": "^2.6.1",
+    "nodemon": "^2.0.15",
+    "truffle": "^5.4.19",
+    "truffle-contract": "^4.0.31"
+  }
+}
