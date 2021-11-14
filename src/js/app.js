@@ -78,7 +78,7 @@ App = {
     getPermittedDoctors: async() => {
         const pdCount = await App.robin.permittedDoctorsCount();
 
-        const $pdTemplate = $('<li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-small"> </li>')
+        const $pdTemplate = $('<li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-sm"> </li>')
 
         for (let i = 1; i <= pdCount; i++) {
             const pd = await App.robin.permittedDoctorsList(App.account, i)
@@ -118,7 +118,44 @@ App = {
     },
 
     getReport: async() => {
-        const reportCount = await App.robin.reportCount()
+        const reportCount = await App.robin.reportCount();
+
+        for (let i = reportCount; i >= 1; i--) {
+            const report = await App.robin.reports(App.account, i);
+            console.log("report", report)
+
+            if (report[0] != App.zeroAddress) {
+                const $accordionTemplate = `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${i}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}">
+                        
+                            <span class="fs-md">
+                            ${report[1]} 
+                            </span>
+
+                            <span class="fs-sm">
+                            &nbsp;(${report[2]})
+                            </span>
+
+                        </button>
+                        </h2>
+                        <div id="collapse${i}" class="accordion-collapse collapse" aria-labelledby="heading${i}" data-bs-parent="#accordion">
+                        <div class="accordion-body fs-md">
+                            Doctor: ${report[0]} </br></br>
+                            Report: </br>
+                            ${report[3]}
+                        </div>
+                        </div>
+                    </div>
+                `
+                $('#accordion').append($accordionTemplate);
+            }
+        }
+
+        const firstAccordionChild = $('.accordion-item').first()
+        firstAccordionChild.find('button').removeClass('collapsed');
+        firstAccordionChild.find('.accordion-collapse').addClass('show')
     },
 
     render: async() => {
@@ -133,8 +170,10 @@ App = {
         // Render Account
         $('#account').html(App.account)
 
-        // Render Tasks
+        // Render View
         await App.getPermittedDoctors()
+
+        await App.getReport();
 
         // Update loading state
         App.setLoading(false)
