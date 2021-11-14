@@ -12,3 +12,37 @@ This is the reality of some doctors, nurses & health professionals today. They a
 
 ## Proposed solution
 With the help of a decentralized application based on the ethereum network, patient records can be securely available on the blockchain and only authorized persons can access it anywhere in the world.
+
+## Installation and Setup
+This setup assumes you already have [truffle](https://trufflesuite.com/docs/truffle/getting-started/installation) and [ganache](https://trufflesuite.com/ganache) install globallyon yout local machine.
+
+1. Clone the repository
+
+    ```
+    git clone https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project.git
+    ```
+2. Install Dependencies
+    ```
+    npm install
+    ```
+
+3. Deploy the contract to the local blockchain: 
+
+    *Kindly make sure ganche is running ganache us running, and that you already have [metamask](https://metamask.io) install on your browser.*
+    ```
+    truffle migrate --reset
+    ```
+
+    There result should end with something like this: 
+
+    ```
+    Summary
+    =======
+    > Total deployments:   2
+    > Final cost:          0.02422906 ETH
+    ```
+
+4. To start the application, run the command below in the root directory onf the application: 
+    ```
+    npm run dev
+    ```

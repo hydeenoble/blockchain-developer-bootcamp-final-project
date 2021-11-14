@@ -4,8 +4,8 @@ pragma solidity >=0.4.22 <0.9.0;
 // robin = await Robin.deployed()
 
 contract Robin {
-    uint public permittedDoctorsCount = 0;
-    uint public reportCount = 0;
+    uint256 public permittedDoctorsCount = 0;
+    uint256 public reportCount = 0;
     address public owner = msg.sender;
 
     // mapping (address => bool) public permittedDoctors;
@@ -13,10 +13,10 @@ contract Robin {
 
     // mapping(address => mapping(uint => mapping(address => bool))) public permittedDoctors;
 
-    mapping(address => mapping(uint => address)) public permittedDoctorsList;
+    mapping(address => mapping(uint256 => address)) public permittedDoctorsList;
     mapping(address => mapping(address => bool)) public permittedDoctors;
 
-    mapping(address => mapping(uint => Report)) public reports;
+    mapping(address => mapping(uint256 => Report)) public reports;
 
     /*
      * enum
@@ -62,9 +62,12 @@ contract Robin {
     constructor() public {}
 
     // a patient should not be able to grant his/her self permission
-    function grantAccess(address _patient, address _doctor) public returns (bool) {
-        permittedDoctorsCount ++;
-        
+    function grantAccess(address _patient, address _doctor)
+        public
+        returns (bool)
+    {
+        permittedDoctorsCount++;
+
         permittedDoctorsList[_patient][permittedDoctorsCount] = _doctor;
         permittedDoctors[_patient][_doctor] = true;
 
@@ -74,13 +77,23 @@ contract Robin {
     }
 
     // patienrs should be able to revoke doctors permission as anytime
-    function revokeAccess(address _patient, address _doctor, uint _pdcount) public {
+    function revokeAccess(
+        address _patient,
+        address _doctor,
+        uint256 _pdcount
+    ) public {
         delete permittedDoctorsList[_patient][_pdcount];
         delete permittedDoctors[_patient][_doctor];
     }
 
     // only permitted doctors should be able to create a report
-    function createReport(address _doctor, address _patient, string memory _subject, string memory _date,  string memory _report) public  returns (bool) {
+    function createReport(
+        address _doctor,
+        address _patient,
+        string memory _subject,
+        string memory _date,
+        string memory _report
+    ) public returns (bool) {
         reportCount++;
 
         reports[_patient][reportCount] = Report({
