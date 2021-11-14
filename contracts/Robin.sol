@@ -5,6 +5,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract Robin {
     uint public permittedDoctorsCount = 0;
+    uint public reportCount = 0;
     address public owner = msg.sender;
 
     // mapping (address => bool) public permittedDoctors;
@@ -15,7 +16,7 @@ contract Robin {
     mapping(address => mapping(uint => address)) public permittedDoctorsList;
     mapping(address => mapping(address => bool)) public permittedDoctors;
 
-    mapping(address => Report) public reports;
+    mapping(address => mapping(uint => Report)) public reports;
 
     /*
      * enum
@@ -38,9 +39,9 @@ contract Robin {
     struct Report {
         // address patientId;
         address doctorId;
-        string title;
+        string subject;
         string date;
-        string content;
+        string report;
     }
 
     /*
@@ -72,13 +73,6 @@ contract Robin {
         return permittedDoctors[_patient][_doctor];
     }
 
-    // function getListOfPermittedDoctors(address _patient) public {
-    //     // check if this is the patient
-        
-    //     // delete permittedDoctors[_patient][_doctor];
-
-    // }
-
     // patienrs should be able to revoke doctors permission as anytime
     function revokeAccess(address _patient, address _doctor, uint _pdcount) public {
         delete permittedDoctorsList[_patient][_pdcount];
@@ -86,7 +80,18 @@ contract Robin {
     }
 
     // only permitted doctors should be able to create a report
-    function createReport() public {}
+    function createReport(address _doctor, address _patient, string memory _subject, string memory _date,  string memory _report) public  returns (bool) {
+        reportCount++;
+
+        reports[_patient][reportCount] = Report({
+            doctorId: _doctor,
+            subject: _subject,
+            date: _date,
+            report: _report
+        });
+
+        return true;
+    }
 
     // only permitted doctors and owner should be able to list reports
     function getReports() public {}

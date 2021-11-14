@@ -97,6 +97,30 @@ App = {
         }
     },
 
+    createReport: async() => {
+        App.setLoading(true);
+
+        const today = new Date();
+        const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+        const reportSubject = $('#report-subject').val();
+        const patientsAddress = $('#patient-address').val();
+        const medicalReport = $('#medical-report').val();
+
+        console.log("reportSubject", reportSubject);
+        console.log("patientsAddress", patientsAddress);
+        console.log("medicalReport", medicalReport);
+        console.log("report date", date);
+
+        await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
+
+        window.location.reload()
+    },
+
+    getReport: async() => {
+        const reportCount = await App.robin.reportCount()
+    },
+
     render: async() => {
         // Prevent double render
         if (App.loading) {
