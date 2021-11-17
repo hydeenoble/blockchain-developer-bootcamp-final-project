@@ -1,0 +1,76 @@
+.fs-sm {
+    font-size: 0.65rem
+}
+
+.fs-md {
+    font-size: 0.8rem
+}
+
+.rb-signin {
+    /* border: 1px solid red; */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.rb-signin-banner {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rb-signin-banner img {
+    height: 50px;
+    /* flex: 1; */
+}
+
+.rb-signin-banner p {
+    font-size: 2rem;
+}
+
+.rb-signin-options {
+    /* border: 1px solid red; */
+    margin: 0 30rem;
+    /* display: flex; */
+}
+
+.rb-signin-option {
+    padding: 10rem 0;
+    /* border: 1px solid red; */
+    text-align: center;
+    font-size: 2rem;
+}
+
+.option-doctor {
+    color: #6c757d;
+    border-color: #6c757d;
+    margin-right: 0.5rem;
+}
+
+.option-doctor:hover {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.option-patient {
+    color: #198754;
+    border-color: #198754;
+    margin-left: 0.5rem;
+}
+
+.option-patient:hover {
+    color: #fff;
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.rb-content {
+    padding: 0;
+}
+
+#main-content {
+    margin-top: 3rem;
+}

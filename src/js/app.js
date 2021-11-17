@@ -3,17 +3,36 @@ App = {
     zeroAddress: "0x0000000000000000000000000000000000000000",
     contracts: {},
 
+    handleRegisteration: async(e) => {
+
+        await App.loadWeb3(true)
+        await App.loadContract()
+
+        await App.robin.registerUsers(App.account, e.data.isDoctor, e.data.isPatient, { from: App.account })
+
+        window.location.reload()
+    },
+
     load: async() => {
         await App.loadWeb3()
-        await App.loadAccount()
-        await App.loadContract()
-        await App.render()
 
-        // web3.eth.defaultAccount = web3.eth.accounts[0]
+        if (App.account) {
+            await App.loadWeb3()
+            await App.loadContract()
+            await App.render()
+
+            $('.rb-content').show()
+            $('.rb-signin').hide()
+        } else {
+            $('.option-doctor').on('click', { isDoctor: true, isPatient: false }, App.handleRegisteration)
+            $('.option-patient').on('click', { isDoctor: false, isPatient: true }, App.handleRegisteration)
+            $('.rb-content').hide()
+            $('.rb-signin').show()
+        }
     },
 
     // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
-    loadWeb3: async() => {
+    loadWeb3: async(connect = false) => {
         if (typeof web3 !== 'undefined') {
             App.web3Provider = web3.currentProvider
             web3 = new Web3(web3.currentProvider)
@@ -25,7 +44,15 @@ App = {
             window.web3 = new Web3(ethereum);
             try {
                 // Request account access if needed
-                await ethereum.enable();
+                // console.log("getAccounts", ()
+                App.account = (await web3.eth.getAccounts())[0];
+
+                if (connect) {
+                    await ethereum.enable();
+                    App.account = (await web3.eth.getAccounts())[0];
+                }
+
+                // await ethereum.enable();
                 // Acccounts now exposed
                 web3.eth.sendTransaction({ /* ... */ });
             } catch (error) {
@@ -54,15 +81,12 @@ App = {
         App.robin = await App.contracts.Robin.deployed()
     },
 
-    loadAccount: async() => {
-        // Set the current blockchain account
-        App.account = (await web3.eth.getAccounts())[0]
-    },
-
     grantAccess: async() => {
         App.setLoading(true);
         const doctorsAddress = $('#doctors-address').val();
-        await App.robin.grantAccess(App.account, doctorsAddress, { from: App.account })
+        if (doctorsAddress.length > 1) {
+            await App.robin.grantAccess(App.account, doctorsAddress, { from: App.account })
+        }
         window.location.reload()
     },
 
@@ -75,13 +99,21 @@ App = {
         window.location.reload()
     },
 
+    toggleReportFormDisplay: async() => {
+        const isDoctor = await App.robin.doctors(App.account)
+        console.log("isDoctor", isDoctor)
+        if (!isDoctor) {
+            $('#report-contianer').hide()
+        }
+    },
+
     getPermittedDoctors: async() => {
         const pdCount = await App.robin.permittedDoctorsCount();
 
         const $pdTemplate = $('<li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-sm"> </li>')
 
         for (let i = 1; i <= pdCount; i++) {
-            const pd = await App.robin.permittedDoctorsList(App.account, i)
+            const pd = await App.robin.getPermittedDoctorsList(App.account, i)
 
             console.log(i, pd)
 
@@ -112,17 +144,22 @@ App = {
         console.log("medicalReport", medicalReport);
         console.log("report date", date);
 
-        await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
+        try {
+            await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
+        } catch (e) {
+            alert("Something went wrong! Please confirm you have been granted permission by the patient!")
+        }
 
         window.location.reload()
     },
 
     getReport: async() => {
-        const reportCount = await App.robin.reportCount();
+        // const reportCount = await App.robin.reportCount();
+        const reports = await App.robin.getPastEvents("LogPatientReport", { fromBlock: 0 })
 
-        for (let i = reportCount; i >= 1; i--) {
-            const report = await App.robin.reports(App.account, i);
-            console.log("report", report)
+        for (let i = reports.length - 1; i >= 0; i--) {
+
+            const report = reports[i].args.report
 
             if (report[0] != App.zeroAddress) {
                 const $accordionTemplate = `
@@ -131,18 +168,18 @@ App = {
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}">
                         
                             <span class="fs-md">
-                            ${report[1]} 
+                            ${report.subject} 
                             </span>
 
                             <span class="fs-sm">
-                            &nbsp;(${report[2]})
+                            &nbsp;(${report.date})
                             </span>
 
                         </button>
                         </h2>
                         <div id="collapse${i}" class="accordion-collapse collapse" aria-labelledby="heading${i}" data-bs-parent="#accordion">
                         <div class="accordion-body fs-md">
-                            Doctor: ${report[0]} </br></br>
+                            Doctor: ${report.id} </br></br>
                             Report: </br>
                             ${report[3]}
                         </div>
@@ -173,9 +210,13 @@ App = {
         // Render View
         await App.getPermittedDoctors()
 
-        await App.getReport();
+        await App.getReport()
+
+        await App.toggleReportFormDisplay()
 
         // Update loading state
+        t = await App.robin.getPastEvents("LogPatientReport", { fromBlock: 0 })
+        console.log("Past", t[0].args.report)
         App.setLoading(false)
     },
 
@@ -195,6 +236,8 @@ App = {
 
 $(() => {
     $(window).load(() => {
+        // $('.rb-content').hide()
+        // $('.rb-signin').hide()
         App.load()
     })
 })
