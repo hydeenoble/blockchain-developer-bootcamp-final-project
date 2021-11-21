@@ -30,10 +30,10 @@ This setup assumes you already have [truffle](https://trufflesuite.com/docs/truf
 
     *Kindly make sure ganche is running ganache us running, and that you already have [metamask](https://metamask.io) install on your browser.*
     ```
-    truffle migrate --reset
+    truffle migrate --network development --reset
     ```
 
-    There result should end with something like this: 
+    The result should end with something like this: 
 
     ```
     Summary
@@ -42,7 +42,7 @@ This setup assumes you already have [truffle](https://trufflesuite.com/docs/truf
     > Final cost:          0.02422906 ETH
     ```
 
-4. To start the application, run the command below in the root directory onf the application: 
+4. To start the application, run the command below in the root directory of the application: 
     ```
     npm run dev
     ```

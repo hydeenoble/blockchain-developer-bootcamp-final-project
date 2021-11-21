@@ -158,6 +158,7 @@ contract Robin is Ownable {
     /// @dev report detials would be encrypted before adding them to the blockchain.
     function encryptReport(string memory _report)
         private
+        view
         onlyOwner
         returns (string memory)
     {
