@@ -143,7 +143,7 @@ contract Robin is Ownable {
             doctor: _doctor,
             subject: _subject,
             date: _date,
-            report: encryptReport(_report)
+            report: _report
         });
 
         emit LogReport(

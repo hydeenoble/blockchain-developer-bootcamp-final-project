@@ -64,6 +64,9 @@
                       <div class="input-group mb-3">
                         <input id="doctors-address" type="text" class="form-control" placeholder="Doctor's Address" aria-label="Doctor's Address" aria-describedby="button-addon2">
                         <button class="btn btn-outline-success" type="submit" id="button-addon2">Grant Access</button>
+                        <div id="access-address-error" class="rb-error">
+                          Please, provide a valid address!
+                        </div>
                       </div>
                     </form>
                   </div>
@@ -79,21 +82,33 @@
               
               <div id="report-contianer" class="col-sm">
                 <!-- Upload a new report -->
-                <form onSubmit="App.createReport(); return false;">
+                <form onSubmit="App.createReport(); return false;" class="row needs-validation">
                   <div class="mb-3">
                     <label for="report-subject" class="form-label">Subject</label>
-                    <input type="text" class="form-control" id="report-subject" placeholder="">
+                    <input type="text" class="form-control" id="report-subject" placeholder="Medical Report Subject #1" required>
+                    <div class="invalid-feedback">
+                      Please provide a valid Medical Report Subject.
+                    </div>
                   </div>
                   <div class="mb-3">
                     <label for="patientAddress" class="form-label">Patient's Address</label>
-                    <input type="text" class="form-control" id="patient-address" placeholder="0x3E031Aa3B215Fa5c65261A1050084BA941488Ee6">
+                    <input type="text" class="form-control" id="patient-address" placeholder="0x3E031Aa3B215Fa5c65261A1050084BA941488Ee6" required>
+                    <div id="report-address-error" class="rb-error">
+                      You don't seem to have permission to create for this patient. Please ask the patient to grant you access!
+                    </div>
                   </div>
                   <div class="mb-3">
                     <label for="medicalReport" class="form-label">Medical Report</label>
-                    <textarea class="form-control" id="medical-report" rows="4"></textarea>
+                    <textarea class="form-control" id="medical-report" rows="4" placeholder="Medical Report #1" required></textarea>
+                    <div class="invalid-feedback">
+                      Please provide a valid Medical Report.
+                    </div>
                   </div>
 
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <div>
+                    <button id="report-submit-btn" type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                  
 
                 </form>
               </div>

@@ -2,7 +2,7 @@ App = {
     loading: false,
     zeroAddress: "0x0000000000000000000000000000000000000000",
     contracts: {},
-    registeration: false,
+    createFormIsValid: false,
 
     handleRegisteration: async(e) => {
         await App.loadWeb3(true)
@@ -85,7 +85,6 @@ App = {
             window.web3 = new Web3(ethereum);
             try {
                 // Request account access if needed
-                // console.log("getAccounts", ()
                 App.account = (await web3.eth.getAccounts())[0];
 
                 if (connect) {
@@ -123,12 +122,15 @@ App = {
     },
 
     grantAccess: async() => {
-        App.setLoading(true);
+        // App.setLoading(true);
         const doctorsAddress = $('#doctors-address').val();
-        if (doctorsAddress.length > 1) {
-            await App.robin.grantAccess(App.account, doctorsAddress, { from: App.account })
+
+        if (doctorsAddress.length > 1 && App.isValidAddress(doctorsAddress)) {
+            await App.robin.grantAccess(App.account, doctorsAddress, { from: App.account });
+            window.location.reload();
+        } else {
+            $('#access-address-error').show();
         }
-        window.location.reload()
     },
 
     revokeAccess: async(event) => {
@@ -140,7 +142,6 @@ App = {
 
     toggleReportFormDisplay: async() => {
         const isDoctor = await App.robin.doctors(App.account)
-        console.log("isDoctor", isDoctor)
         if (!isDoctor) {
             $('#report-contianer').hide()
         }
@@ -177,7 +178,7 @@ App = {
     },
 
     createReport: async() => {
-        App.setLoading(true);
+        // App.setLoading(true);
 
         const today = new Date();
         const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -186,13 +187,27 @@ App = {
         const patientsAddress = $('#patient-address').val();
         const medicalReport = $('#medical-report').val();
 
-        try {
-            await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
-        } catch (e) {
-            alert("Something went wrong! Please confirm you have been granted permission by the patient!")
+        const permittedDoctors = await App.robin.getPastEvents("LogPermittedDoctors", {
+            filter: { doctor: App.account, patient: patientsAddress },
+            fromBlock: 0
+        });
+
+        if (reportSubject.length > 0 && medicalReport.length > 0 && App.isValidAddress(patientsAddress) && permittedDoctors.length > 0) {
+            App.createFormIsValid = true;
+        } else {
+            $('#report-address-error').show();
+            App.createFormIsValid = false;
         }
 
-        window.location.reload()
+        if (App.createFormIsValid) {
+            try {
+                await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
+            } catch (e) {
+                alert("Something went wrong! Please confirm you have been granted permission by the patient!")
+            }
+
+            window.location.reload()
+        }
     },
 
     getReport: async() => {
@@ -243,12 +258,15 @@ App = {
         return report;
     },
 
+    isValidAddress: (address) => {
+        return /^(0x)?[0-9a-f]{40}$/.test(address.toLowerCase())
+    },
+
     render: async() => {
         // Prevent double render
         if (App.loading) {
             return
         }
-
         // Update app loading state
         App.setLoading(true)
 
