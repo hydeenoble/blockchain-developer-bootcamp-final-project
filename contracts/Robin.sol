@@ -1,27 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 // robin = await Robin.deployed()
 
-contract Robin {
+/// @title Smart contract for discentralizing medical records
+/// @author Idowu Emehinola
+/// @notice You can use this contract for only the basic simulation of discentralizing medical records
+/// @dev The encryption method has not been implemented yet.
+
+contract Robin is Ownable {
+    /// @dev Tracks the number of doctors that has access to a particular patient's medical records.
     uint256 public permittedDoctorsCount = 0;
+    /// @dev Tracks the number of report that a patient has.
     mapping(address => uint256) public reportCount;
-
-    mapping(address => mapping(uint256 => address)) private permittedDoctorsList;
-    mapping(address => mapping(address => bool)) private permittedDoctors;
-    
+    /// @dev Tracks the list of permitted doctors;
+    mapping(address => mapping(uint256 => address))
+        private permittedDoctorsList;
+    /// @dev Tracks the list of permitted doctors;
+    mapping(address => mapping(address => bool)) public permittedDoctors;
+    /// @dev Tracks a list of reports asssociated to a patient.
     mapping(address => mapping(uint256 => Report)) private patientsReports;
-
+    /// @dev Tracks the a list of doctors
     mapping(address => bool) public doctors;
+    /// @dev Tracks the a list of patients
     mapping(address => bool) public patients;
 
-    address public owner = msg.sender;
-    address public txowner = tx.origin;
-
-    /** 
-    * enum
-    */
-    enum UserType { Doctor, Patient }
     /*
      * struct
      */
@@ -36,53 +40,77 @@ contract Robin {
     /*
      * Events
      */
-
-    event LogPermittedDoctors(address indexed patient, address indexed doctor, bool permitted);
-    event LogReport(address indexed patient, address indexed doctor, Report report);
+    /// @notice List of all permitted doctors.
+    /// @dev Used as a helper when iterating over the list of doctors in the frontend.
+    event LogPermittedDoctors(
+        address indexed patient,
+        address indexed doctor,
+        bool permitted
+    );
+    /// @notice List of all Report.
+    /// @dev Used as a helper when iterating over the list of reports in the frontend.
+    event LogReport(
+        address indexed patient,
+        address indexed doctor,
+        Report report
+    );
 
     /*
      * Modifiers
      */
 
-    modifier verifyPermission (address _patient, address _doctor) { 
-        if (_patient != _doctor){
-            require (permittedDoctors[_patient][_doctor], "You don't have the required permission to create a report for this Patient!");
+    /// @notice Verfity if a patient has given permission to a doctor.
+    modifier verifyPermission(address _patient, address _doctor) {
+        if (_patient != _doctor) {
+            require(
+                permittedDoctors[_patient][_doctor],
+                "Doctor needs to be granted permission to perform this action!"
+            );
         }
         _;
     }
 
-    modifier isOwner(address _patient) {
-        require(msg.sender == _patient, "This is not the Patient!");
-        _;
-    }
+    // modifier isOwner(address _patient) {
+    //     require(msg.sender == _patient, "This is not the Patient!");
+    //     _;
+    // }
 
-    constructor() public {}
+    constructor() {}
 
-    function registerUsers(address _address, bool _isDoctor, bool _isPatient) public returns (bool){
-        
+    /// @notice Adds a user and maps the right user type based on that is select from the frontend
+    /// @param _address the new user to map to user type
+    /// @param _isDoctor is `true` is the user is a doctor
+    /// @param _isPatient is `true` is the user is a patient
+    /// @dev map a user to a specify user type
+    function registerUsers(
+        address _address,
+        bool _isDoctor,
+        bool _isPatient
+    ) public returns (bool) {
         doctors[_address] = _isDoctor;
-
         patients[_address] = _isPatient;
-
         return true;
     }
 
     // a patient should not be able to grant his/her self permission
-    function grantAccess(address _patient, address _doctor)
-        public
-        returns (bool)
-    {
+    /// @notice Grants access to a doctor to create report for a patient
+    /// @param _patient The patient granting access
+    /// @param _doctor The doctor being granted access
+    /// @dev These address should be valid address
+    function grantAccess(address _patient, address _doctor) public {
         permittedDoctorsCount++;
 
         permittedDoctorsList[_patient][permittedDoctorsCount] = _doctor;
         permittedDoctors[_patient][_doctor] = true;
 
         emit LogPermittedDoctors(_patient, _doctor, true);
-
-        return permittedDoctors[_patient][_doctor];
     }
 
     // patienrs should be able to revoke doctors permission as anytime
+    /// @notice Revoke the access of a doctor to create report for a patient
+    /// @param _patient The patient revoking access
+    /// @param _doctor The doctor whose access is being revoked
+    /// @dev These address should be valid address
     function revokeAccess(
         address _patient,
         address _doctor,
@@ -92,19 +120,21 @@ contract Robin {
         delete permittedDoctors[_patient][_doctor];
     }
 
-    function getPermittedDoctorsList(address _patient, uint _permittedDoctorsCount) public view returns (address) {
-        return permittedDoctorsList[_patient][_permittedDoctorsCount];
-    }
-
     // only permitted doctors should be able to create a report
+    /// @notice Add a medical record to the smart contract state
+    /// @param _doctor The doctor creating the report
+    /// @param _patient The patient whose report is being created
+    /// @param _subject subject/title of the report
+    /// @param _date the date the report was created
+    /// @param _report medical report of the patient
+    /// @dev Only doctor's with permission can create a report
     function createReport(
         address _doctor,
         address _patient,
         string memory _subject,
         string memory _date,
         string memory _report
-    ) public verifyPermission(_patient, _doctor) returns (bool) {
-        
+    ) public verifyPermission(_patient, _doctor) {
         reportCount[_patient]++;
 
         patientsReports[_patient][reportCount[_patient]] = Report({
@@ -115,14 +145,22 @@ contract Robin {
             report: encryptReport(_report)
         });
 
-        emit LogReport(_patient, _doctor, patientsReports[_patient][reportCount[_patient]]);
-        
-        return true;
+        emit LogReport(
+            _patient,
+            _doctor,
+            patientsReports[_patient][reportCount[_patient]]
+        );
     }
 
-    // report detials should be encrypted before adding them to the blockchain.
-    function encryptReport(string memory _report) private pure returns (string memory) {
-        // TODO: Do come heavy encryption
+    /// @notice Encrpt report before adding them to the blockchain
+    /// @param _report The report to encrypt
+    /// @dev report detials would be encrypted before adding them to the blockchain.
+    function encryptReport(string memory _report)
+        private
+        onlyOwner
+        returns (string memory)
+    {
+        // TODO: Do come heavy encryption :)
         return _report;
     }
 }
