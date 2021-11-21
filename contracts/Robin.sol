@@ -5,18 +5,12 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract Robin {
     uint256 public permittedDoctorsCount = 0;
-    uint256 public reportCount = 0;
-    // address public owner = msg.sender;
+    mapping(address => uint256) public reportCount;
 
     mapping(address => mapping(uint256 => address)) private permittedDoctorsList;
     mapping(address => mapping(address => bool)) private permittedDoctors;
     
-    mapping(address => mapping(uint256 => Report)) private patientsReports; //Patients's copy of the report
-    // mapping(address => mapping(uint256 => Report)) private doctorsReports; //Doctor's copy of the report
-
-    mapping(address => mapping( address => mapping(uint256 => Report))) private doctorsReports; //Doctor's copy of the report
-
-    // mapping(uint256 => Report)
+    mapping(address => mapping(uint256 => Report)) private patientsReports;
 
     mapping(address => bool) public doctors;
     mapping(address => bool) public patients;
@@ -32,7 +26,8 @@ contract Robin {
      * struct
      */
     struct Report {
-        address id;
+        address patient;
+        address doctor;
         string subject;
         string date;
         string report;
@@ -42,65 +37,33 @@ contract Robin {
      * Events
      */
 
-    event LogPermittedDoctors(address patient, address doctor, bool permitted);
-    event LogPatientReport(Report report);
-    event LogDoctorReport(Report report);
+    event LogPermittedDoctors(address indexed patient, address indexed doctor, bool permitted);
+    event LogReport(address indexed patient, address indexed doctor, Report report);
 
     /*
      * Modifiers
      */
 
     modifier verifyPermission (address _patient, address _doctor) { 
-        require (permittedDoctors[_patient][_doctor], "You don't have the required permission to create a report for this Patient!"); 
+        if (_patient != _doctor){
+            require (permittedDoctors[_patient][_doctor], "You don't have the required permission to create a report for this Patient!");
+        }
         _;
     }
 
     modifier isOwner(address _patient) {
-    require(msg.sender == _patient, "This is not the Patient!");
-    _;
-  }
+        require(msg.sender == _patient, "This is not the Patient!");
+        _;
+    }
 
     constructor() public {}
 
-    // function getTXOwner() public returns (address) {
-    //     return tx.origin;
-    // }
-
-    // function getOwner() public returns (address) {
-    //     return msg.sender;
-    // }
-
-    // function doctorType() public pure returns (UserType){
-    //     return UserType.Doctor;
-    // }
-
-    // function patientType() public pure returns (UserType){
-    //     return UserType.Patient;
-    // }
-
-    // function getUserType(address _address) public returns (UserType) {
-    //     return users[_address];
-    // } 
-
-    // function isDoctor(address _address) public returns (bool) {
-    //     return users[_address] == UserType.Doctor;
-    // } 
-
-    // function isPatient(address _address) public returns (bool) {
-    //     return users[_address] == UserType.Patient;
-    // } 
-
     function registerUsers(address _address, bool _isDoctor, bool _isPatient) public returns (bool){
         
-        if (_isDoctor) {
-            doctors[_address] = true;
-        }
+        doctors[_address] = _isDoctor;
 
-        if (_isPatient) {
-            patients[_address] = true;
-        }
+        patients[_address] = _isPatient;
 
-        // users[_address] = _userType;
         return true;
     }
 
@@ -124,7 +87,7 @@ contract Robin {
         address _patient,
         address _doctor,
         uint256 _pdcount
-    ) public {
+    ) public verifyPermission(_patient, _doctor) {
         delete permittedDoctorsList[_patient][_pdcount];
         delete permittedDoctors[_patient][_doctor];
     }
@@ -140,41 +103,26 @@ contract Robin {
         string memory _subject,
         string memory _date,
         string memory _report
-    ) public returns (bool) { //verifyPermission(_patient, _doctor)
-        reportCount++;
+    ) public verifyPermission(_patient, _doctor) returns (bool) {
+        
+        reportCount[_patient]++;
 
-        patientsReports[_patient][reportCount] = Report({
-            id: _doctor,
+        patientsReports[_patient][reportCount[_patient]] = Report({
+            patient: _patient,
+            doctor: _doctor,
             subject: _subject,
             date: _date,
             report: encryptReport(_report)
         });
 
-        doctorsReports[_doctor][_patient][reportCount] = Report({
-            id: _patient,
-            subject: _subject,
-            date: _date,
-            report: encryptReport(_report)
-        });
-
-        emit LogPatientReport(patientsReports[_patient][reportCount]);
-
+        emit LogReport(_patient, _doctor, patientsReports[_patient][reportCount[_patient]]);
+        
         return true;
-    }
-
-    // only permitted doctors and owner should be able to list reports
-    // isOwner(_patient)
-    // function getPatientReports(address _patient, uint _reportCount) public returns (Report memory) {
-    //     emit LogPatientReport(patientsReports[_patient][_reportCount]);
-    //     return patientsReports[_patient][_reportCount];
-    // }
-
-    function getDoctorsReports(address _doctor, address _patient, uint _reportCount) public view verifyPermission(_patient, _doctor) returns (Report memory) {
-        return doctorsReports[_doctor][_patient][_reportCount];
     }
 
     // report detials should be encrypted before adding them to the blockchain.
     function encryptReport(string memory _report) private pure returns (string memory) {
+        // TODO: Do come heavy encryption
         return _report;
     }
 }

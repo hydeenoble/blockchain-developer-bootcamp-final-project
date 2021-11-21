@@ -2,15 +2,56 @@ App = {
     loading: false,
     zeroAddress: "0x0000000000000000000000000000000000000000",
     contracts: {},
+    registeration: false,
 
     handleRegisteration: async(e) => {
-
         await App.loadWeb3(true)
         await App.loadContract()
 
         await App.robin.registerUsers(App.account, e.data.isDoctor, e.data.isPatient, { from: App.account })
-
         window.location.reload()
+    },
+
+    loadSampleReport: async() => {
+        const reports = await App.robin.getPastEvents("LogReport", {
+            filter: { patient: App.account },
+            fromBlock: 0
+        });
+
+        if (reports.length == 0) {
+            const today = new Date();
+            const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+            const reportSubject = "Sample Medical Report";
+            const medicalReport = `
+            Mr Tan was brought to the clinic in a wheel chair. His mood was euthymic (i.e.
+            normal, non-depressed and reasonably positive mood) and he did not have any
+            psychotic symptoms.
+            Orientation to time, place and person
+            With regard to his orientation to time, place and person, he was unable to tell that he
+            was in a hospital clinic but identified his son and was able to tell his own name and
+            the name of his son. After being told he was in a hospital clinic, he identified me as a
+            doctor, when asked. However, he could not remember my name, although I have been
+            treating him for the last 5 years. He was able to tell correctly how he arrived at the
+            clinic. However, when asked some moments later where he was, he said he did not
+            know.
+            He said that it was 10 February (actual date 20 June) and it was a Wednesday (actual
+            day, Monday). He appeared to be just guessing as to what date and day it was. After
+            being told what the day and date were, he forgot a few moments later after being
+            asked again. He could not answer when asked what year it was.
+            When asked what time it was, he said that it was 5pm in the afternoon (actual time,
+            3pm). He was not able to tell the time from looking at a watch.
+            Basic information
+            He gave his age as 50 years old (actually 55 years) and could not answer when asked
+            when his birthday was. He correctly said he lived in a flat with his son, but could not
+            give the correct address, and also got the area wrong (he said the flat was in Bedok,
+            when it was actually in Jurong.) He incorrectly stated that the Prime Minister was Lee
+            Kuan Yew.
+        `
+            await App.robin.createReport(App.account, App.account, reportSubject, date, medicalReport, { from: App.account })
+            window.location.reload()
+        }
+
     },
 
     load: async() => {
@@ -91,8 +132,6 @@ App = {
     },
 
     revokeAccess: async(event) => {
-        console.log(event.data.pdId);
-
         alert(`Are you sure you was to revoke access for ${event.data.pdAdrress}?`);
 
         await App.robin.revokeAccess(App.account, event.data.pdAdrress, event.data.pdId, { from: App.account });
@@ -107,26 +146,34 @@ App = {
         }
     },
 
-    getPermittedDoctors: async() => {
-        const pdCount = await App.robin.permittedDoctorsCount();
+    displayAccountDetails: async() => {
+        const isDoctor = await App.robin.doctors(App.account)
+        if (!isDoctor) {
+            $('#account').html("(Patient) " + App.account)
+        } else {
+            $('#account').html("(Doctor) " + App.account)
+        }
+    },
 
+    getPermittedDoctors: async() => {
+        const permittedDoctors = await App.robin.getPastEvents("LogPermittedDoctors", {
+            filter: { patient: App.account },
+            fromBlock: 0
+        });
         const $pdTemplate = $('<li class="pd-li list-group-item d-flex justify-content-between align-items-center fs-sm"> </li>')
 
-        for (let i = 1; i <= pdCount; i++) {
-            const pd = await App.robin.getPermittedDoctorsList(App.account, i)
+        for (let i = 0; i < permittedDoctors.length; i++) {
+            const pd = permittedDoctors[i].args.doctor
 
-            console.log(i, pd)
+            const $newPdTemplate = $pdTemplate.clone();
+            $newPdTemplate.html(
+                `${pd} <i class = "bi bi-trash-fill" > </i>`
+            ).on('click', { pdId: i, pdAdrress: pd }, App.revokeAccess);
 
-            if (pd != App.zeroAddress) {
-                const $newPdTemplate = $pdTemplate.clone();
-                $newPdTemplate.html(
-                    `${pd} <i class = "bi bi-trash-fill" > </i>`
-                ).on('click', { pdId: i, pdAdrress: pd }, App.revokeAccess);
-
-                $('#pd-ul').append($newPdTemplate)
-                $newPdTemplate.show()
-            }
+            $('#pd-ul').append($newPdTemplate)
+            $newPdTemplate.show()
         }
+
     },
 
     createReport: async() => {
@@ -139,11 +186,6 @@ App = {
         const patientsAddress = $('#patient-address').val();
         const medicalReport = $('#medical-report').val();
 
-        console.log("reportSubject", reportSubject);
-        console.log("patientsAddress", patientsAddress);
-        console.log("medicalReport", medicalReport);
-        console.log("report date", date);
-
         try {
             await App.robin.createReport(App.account, patientsAddress, reportSubject, date, medicalReport, { from: App.account })
         } catch (e) {
@@ -154,19 +196,21 @@ App = {
     },
 
     getReport: async() => {
-        // const reportCount = await App.robin.reportCount();
-        const reports = await App.robin.getPastEvents("LogPatientReport", { fromBlock: 0 })
+
+        const reports = await App.robin.getPastEvents("LogReport", {
+            filter: { patient: App.account },
+            fromBlock: 0
+        });
 
         for (let i = reports.length - 1; i >= 0; i--) {
 
             const report = reports[i].args.report
 
-            if (report[0] != App.zeroAddress) {
-                const $accordionTemplate = `
+            const $accordionTemplate = `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading${i}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}">
-                        
+
                             <span class="fs-md">
                             ${report.subject} 
                             </span>
@@ -179,20 +223,24 @@ App = {
                         </h2>
                         <div id="collapse${i}" class="accordion-collapse collapse" aria-labelledby="heading${i}" data-bs-parent="#accordion">
                         <div class="accordion-body fs-md">
-                            Doctor: ${report.id} </br></br>
+                            Doctor: ${report.doctor} </br></br>
                             Report: </br>
-                            ${report[3]}
+                            ${ await App.decryptReport(report.report)}
                         </div>
                         </div>
                     </div>
                 `
-                $('#accordion').append($accordionTemplate);
-            }
+            $('#accordion').append($accordionTemplate);
         }
 
         const firstAccordionChild = $('.accordion-item').first()
         firstAccordionChild.find('button').removeClass('collapsed');
         firstAccordionChild.find('.accordion-collapse').addClass('show')
+    },
+
+    decryptReport: async(report) => {
+        // TODO: Do some heavy decryption 
+        return report;
     },
 
     render: async() => {
@@ -205,18 +253,15 @@ App = {
         App.setLoading(true)
 
         // Render Account
-        $('#account').html(App.account)
+        await App.displayAccountDetails();
 
         // Render View
         await App.getPermittedDoctors()
-
         await App.getReport()
-
         await App.toggleReportFormDisplay()
+        await App.loadSampleReport()
 
         // Update loading state
-        t = await App.robin.getPastEvents("LogPatientReport", { fromBlock: 0 })
-        console.log("Past", t[0].args.report)
         App.setLoading(false)
     },
 
@@ -236,8 +281,6 @@ App = {
 
 $(() => {
     $(window).load(() => {
-        // $('.rb-content').hide()
-        // $('.rb-signin').hide()
         App.load()
     })
 })
