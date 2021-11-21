@@ -24,30 +24,30 @@ App = {
 
             const reportSubject = "Sample Medical Report";
             const medicalReport = `
-            Mr Tan was brought to the clinic in a wheel chair. His mood was euthymic (i.e.
-            normal, non-depressed and reasonably positive mood) and he did not have any
-            psychotic symptoms.
-            Orientation to time, place and person
-            With regard to his orientation to time, place and person, he was unable to tell that he
-            was in a hospital clinic but identified his son and was able to tell his own name and
-            the name of his son. After being told he was in a hospital clinic, he identified me as a
-            doctor, when asked. However, he could not remember my name, although I have been
-            treating him for the last 5 years. He was able to tell correctly how he arrived at the
-            clinic. However, when asked some moments later where he was, he said he did not
-            know.
-            He said that it was 10 February (actual date 20 June) and it was a Wednesday (actual
-            day, Monday). He appeared to be just guessing as to what date and day it was. After
-            being told what the day and date were, he forgot a few moments later after being
-            asked again. He could not answer when asked what year it was.
-            When asked what time it was, he said that it was 5pm in the afternoon (actual time,
-            3pm). He was not able to tell the time from looking at a watch.
-            Basic information
-            He gave his age as 50 years old (actually 55 years) and could not answer when asked
-            when his birthday was. He correctly said he lived in a flat with his son, but could not
-            give the correct address, and also got the area wrong (he said the flat was in Bedok,
-            when it was actually in Jurong.) He incorrectly stated that the Prime Minister was Lee
-            Kuan Yew.
-        `
+                Mr Tan was brought to the clinic in a wheel chair. His mood was euthymic (i.e.
+                normal, non-depressed and reasonably positive mood) and he did not have any
+                psychotic symptoms.
+                Orientation to time, place and person
+                With regard to his orientation to time, place and person, he was unable to tell that he
+                was in a hospital clinic but identified his son and was able to tell his own name and
+                the name of his son. After being told he was in a hospital clinic, he identified me as a
+                doctor, when asked. However, he could not remember my name, although I have been
+                treating him for the last 5 years. He was able to tell correctly how he arrived at the
+                clinic. However, when asked some moments later where he was, he said he did not
+                know.
+                He said that it was 10 February (actual date 20 June) and it was a Wednesday (actual
+                day, Monday). He appeared to be just guessing as to what date and day it was. After
+                being told what the day and date were, he forgot a few moments later after being
+                asked again. He could not answer when asked what year it was.
+                When asked what time it was, he said that it was 5pm in the afternoon (actual time,
+                3pm). He was not able to tell the time from looking at a watch.
+                Basic information
+                He gave his age as 50 years old (actually 55 years) and could not answer when asked
+                when his birthday was. He correctly said he lived in a flat with his son, but could not
+                give the correct address, and also got the area wrong (he said the flat was in Bedok,
+                when it was actually in Jurong.) He incorrectly stated that the Prime Minister was Lee
+                Kuan Yew.
+            `
             await App.robin.createReport(App.account, App.account, reportSubject, date, medicalReport, { from: App.account })
             window.location.reload()
         }
