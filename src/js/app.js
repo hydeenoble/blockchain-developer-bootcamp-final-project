@@ -1,6 +1,5 @@
 App = {
     loading: false,
-    zeroAddress: "0x0000000000000000000000000000000000000000",
     contracts: {},
     createFormIsValid: false,
 
@@ -118,7 +117,8 @@ App = {
         App.contracts.Robin.setProvider(App.web3Provider)
 
         // Hydrate the smart contract with values from the blockchain
-        App.robin = await App.contracts.Robin.deployed()
+        App.robin = await App.contracts.Robin.at("0x7e69fb5eaF92dad32549554a3075952876B7eEEC")
+            // App.robin = await App.contracts.Robin.deployed()
     },
 
     grantAccess: async() => {
@@ -277,7 +277,7 @@ App = {
         await App.getPermittedDoctors()
         await App.getReport()
         await App.toggleReportFormDisplay()
-        await App.loadSampleReport()
+            // await App.loadSampleReport()
 
         // Update loading state
         App.setLoading(false)

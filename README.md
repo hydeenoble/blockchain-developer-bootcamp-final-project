@@ -13,6 +13,14 @@ This is the reality of some doctors, nurses & health professionals today. They a
 ## Proposed solution
 With the help of a decentralized application based on the ethereum network, patient records can be securely available on the blockchain and only authorized persons can access it anywhere in the world.
 
+## Screencast link
+
+https://youtu.be/mk9sVyzeKks
+
+## Public Ethereum wallet for certification:
+
+`0x7e69fb5eaF92dad32549554a3075952876B7eEEC`
+
 ## Local installation and Setup
 This setup assumes you already have [truffle](https://trufflesuite.com/docs/truffle/getting-started/installation) and [ganache](https://trufflesuite.com/ganache) install globallyon yout local machine.
 

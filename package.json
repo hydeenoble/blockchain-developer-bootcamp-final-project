@@ -9,7 +9,8 @@
     "scripts": {
         "dev": "lite-server",
         "test": "echo \"Error: no test specified\" && sexit 1",
-        "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol"
+        "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol",
+        "build": "./node_modules/.bin/truffle compile && ./deploy.sh"
     },
     "repository": {
         "type": "git",
@@ -27,8 +28,10 @@
     "homepage": "https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project#readme",
     "devDependencies": {
         "@openzeppelin/contracts": "^4.3.3",
+        "@truffle/hdwallet-provider": "^1.7.0",
         "bootstrap": "^5.1.3",
         "bootstrap-icons": "^1.7.0",
+        "dotenv": "^10.0.0",
         "lite-server": "^2.6.1",
         "nodemon": "^2.0.15",
         "prettier": "^2.4.1",
