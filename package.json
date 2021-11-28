@@ -11,7 +11,7 @@
         "start": "lite-server",
         "test": "echo \"Error: no test specified\" && sexit 1",
         "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol",
-        "build": "./node_modules/.bin/truffle compile && ./deploy.sh"
+        "build": "./node_modules/.bin/truffle compile"
     },
     "repository": {
         "type": "git",
