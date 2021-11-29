@@ -27,7 +27,7 @@
         "url": "https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project/issues"
     },
     "homepage": "https://github.com/hydeenoble/blockchain-developer-bootcamp-final-project#readme",
-    "devDependencies": {
+    "dependencies": {
         "@openzeppelin/contracts": "^4.3.3",
         "@truffle/hdwallet-provider": "^1.7.0",
         "bootstrap": "^5.1.3",
