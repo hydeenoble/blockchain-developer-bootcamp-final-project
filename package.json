@@ -8,7 +8,6 @@
     },
     "scripts": {
         "dev": "lite-server",
-        "start": "lite-server",
         "test": "echo \"Error: no test specified\" && sexit 1",
         "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol",
         "build": "./node_modules/.bin/truffle compile"
