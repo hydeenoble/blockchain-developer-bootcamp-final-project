@@ -21,6 +21,9 @@ https://youtu.be/mk9sVyzeKks
 
 `0x7e69fb5eaF92dad32549554a3075952876B7eEEC`
 
+## App URL:
+https://robin-dapp.herokuapp.com
+
 ## Local installation and Setup
 This setup assumes you already have [truffle](https://trufflesuite.com/docs/truffle/getting-started/installation) and [ganache](https://trufflesuite.com/ganache) install globallyon yout local machine.
 
@@ -53,6 +56,11 @@ This setup assumes you already have [truffle](https://trufflesuite.com/docs/truf
 4. To start the application, run the command below in the root directory of the application: 
     ```
     npm run dev
+    ```
+
+5. Spin up your browser and enter the URL below: 
+    ```
+    http://localhost:3000
     ```
 
 TODO Features
